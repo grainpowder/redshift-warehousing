@@ -1,0 +1,40 @@
+{
+    "DEFAULT": {
+        "admin_profile": "admin.kim",
+        "region": "ap-northeast-2"
+    },
+    "s3": {
+        "log_data": "s3://udacity-dend/log-data",
+        "log_jsonpath": "s3://udacity-dend/log_json_path.json",
+        "song_data": "s3://udacity-dend/song-data"
+    },
+    "cluster": {
+        "identifier": "sparkify-dw",
+        "db_port": 5439,
+        "db_name": "sparkify",
+        "node_type": "dc2.large",
+        "node_count": 2
+    },
+    "cluster.subnet.group": {
+        "name": "rs-pub-subnet-group",
+        "desc": "public subnet group for redshift cluster"
+    },
+    "network.vpc": {
+        "cidr": "172.10.0.0/16",
+        "name": "prod",
+        "igw_name": "prod-igw",
+        "sg_name": "redshift"
+    },
+    "network.subnet.a": {
+        "cidr": "172.10.100.0/24",
+        "name": "dw-pub-a",
+        "rt_name": "rt-dw-pub",
+        "az": "${region}a"
+    },
+    "network.subnet.c": {
+        "cidr": "172.10.101.0/24",
+        "name": "dw-pub-c",
+        "rt_name": "${network.subnet.a:rt_name}",
+        "az": "${region}c"
+    }
+}
