@@ -12,12 +12,17 @@
         "identifier": "sparkify-dw",
         "db_port": 5439,
         "db_name": "sparkify",
+        "db_user": "${admin_profile}",
         "node_type": "dc2.large",
         "node_count": 2
     },
     "cluster.subnet.group": {
         "name": "rs-pub-subnet-group",
         "desc": "public subnet group for redshift cluster"
+    },
+    "iam.role": {
+        "name": "redshift-s3-readonly",
+        "policy": "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
     },
     "network.vpc": {
         "cidr": "172.10.0.0/16",

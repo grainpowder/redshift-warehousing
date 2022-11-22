@@ -217,14 +217,53 @@ def create_redshift_cluster(
         cluster_status = cluster_info["ClusterStatus"]
     
     logger.info("Save DB host information in configuration file")
+    cp["cluster"]["db_password"] = db_password
     cp["cluster"]["db_host"] = cluster_info["Endpoint"]["Address"]
     with open(CONFIG_FILE_PATH, "w") as file:
         cp.write(file)
 
 
 @app.command("create-iam")
-def create_iam():
-    pass
+def create_iam_role():
+    cp.read(CONFIG_FILE_PATH)
+    if cp.has_option("iam.role", "arn"):
+        logger.info("Terminate process since S3 read role for Redshift is already defined")
+        exit()
+
+    session = boto3.Session(
+        profile_name=cp.get("DEFAULT", "admin_profile"), 
+        region_name=cp.get("DEFAULT", "region")
+    )
+    iam_client = session.client("iam")
+
+    logger.info("Create IAM role for Redshift cluster")
+    trusted_entity = {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": ["sts:AssumeRole"],
+                "Principal": {"Service": ["redshift.amazonaws.com"]}
+            }
+        ]
+    }
+    role_info = iam_client.create_role(
+        Path=f"/{cp.get('cluster', 'identifier')}/",
+        RoleName=cp.get("iam.role", "name"),
+        AssumeRolePolicyDocument=json.dumps(trusted_entity),
+        Description="Allow Redshift to read S3 buckets"
+    )["Role"]
+
+    logger.info("Attach S3 read policy to created role")
+    iam_client.attach_role_policy(
+        RoleName=cp.get("iam.role", "name"),
+        PolicyArn=cp.get("iam.role", "policy")
+    )
+
+    logger.info("Save ARN of created Redshift role into configuration file")
+    cp["iam.role"]["arn"] = role_info["Arn"]
+    with open(CONFIG_FILE_PATH, "w") as file:
+        cp.write(file)
 
 
 @app.command("delete-vpc")
@@ -322,6 +361,43 @@ def delete_redshift_cluster():
     logger.info("Delete resource IDs from configuration file")
     cp.remove_section("cluster")
     cp.remove_section("cluster.subnet.group")
+    with open(CONFIG_FILE_PATH, "w") as file:
+        cp.write(file)
+
+
+@app.command("delete-iam")
+def delete_iam():
+    cp.read(CONFIG_FILE_PATH)
+    if not cp.has_option("iam.role", "arn"):
+        logger.info("IAM role to be deleted is not defined in configuration file")
+        exit()
+
+    session = boto3.Session(
+        profile_name=cp.get("DEFAULT", "admin_profile"), 
+        region_name=cp.get("DEFAULT", "region")
+    )
+    iam_client = session.client("iam")
+
+    logger.info("Detach S3 read policy from IAM role")
+    iam_client.detach_role_policy(
+        RoleName=cp.get("iam.role", "name"),
+        PolicyArn=cp.get("iam.role", "policy")
+    )
+
+    logger.info("Delete IAM role for Redshift S3 read access")
+    iam_client.delete_role(RoleName=cp.get("iam.role", "name"))
+
+    logger.info("Delete role ARN from configuration file")
+    cp.remove_section("iam.role")
+    with open(CONFIG_FILE_PATH, "w") as file:
+        cp.write(file)
+
+
+@app.command("delete-config")
+def delete_config():
+    logger.info("Delete configuration file from project folder")
+    os.remove(CONFIG_FILE_PATH)
+
 
 if __name__ == "__main__":
     app()
