@@ -1,7 +1,6 @@
 {
     "DEFAULT": {
-        "admin_profile": "admin.kim",
-        "region": "ap-northeast-2"
+        "region": "us-west-2"
     },
     "s3": {
         "log_data": "s3://udacity-dend/log-data",
