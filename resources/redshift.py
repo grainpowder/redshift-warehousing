@@ -11,6 +11,9 @@ def create_cluster(
     session: boto3.Session,
     db_password: str
 ) -> ConfigParser:
+    """
+    define subnet group and create Redshift cluster
+    """
     redshift_client = session.client("redshift")
 
     # Cluster subnet group
@@ -69,6 +72,9 @@ def delete_cluster(
     logger: logging.Logger, 
     session: boto3.Session,
 ) -> None:
+    """
+    delete Redshift cluster and predefined subnet group
+    """
     redshift_client = session.client("redshift")
 
     # Cluster

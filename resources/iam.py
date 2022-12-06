@@ -10,6 +10,9 @@ def create_iam_role(
     logger: logging.Logger, 
     session: boto3.Session,
 ):
+    """
+    create IAM role for Redshift cluster within AWS account
+    """
     iam_client = session.client("iam")
 
     logger.info("Create IAM role for Redshift cluster")
@@ -48,6 +51,9 @@ def delete_iam_role(
     logger: logging.Logger, 
     session: boto3.Session,
 ) -> None:
+    """
+    delete created IAM role for Redshift cluster within AWS account
+    """
     iam_client = session.client("iam")
 
     logger.info("Detach S3 read policy from IAM role")

@@ -18,7 +18,7 @@ app = Typer()
 
 def make_logger(name: str) -> logging.Logger:
     """
-    Return a logger that prints log messages in defined format
+    return a logger that prints log messages in defined format
     """
     # Define log format to be used in each of handler
     formatter = logging.Formatter(
@@ -43,6 +43,9 @@ def build_resources(
     admin_profile: str = typer.Argument(...),
     db_password: str = typer.Argument(...)
 ):
+    """
+    create each component to initiate Redshift cluster
+    """
     parser = ConfigParser(interpolation=ExtendedInterpolation())
     logger = make_logger(__name__)
 
@@ -62,6 +65,9 @@ def build_resources(
 
 @app.command("delete-resources")
 def delete_resources():
+    """
+    delete each component required to initiate Redshift cluster
+    """
     parser = ConfigParser(interpolation=ExtendedInterpolation())
     parser.read(CONFIG_FILE_PATH)
     logger = make_logger(__name__)

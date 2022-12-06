@@ -10,6 +10,9 @@ def create_config(
     parser: ConfigParser, 
     logger: logging.Logger
 ) -> ConfigParser:
+    """
+    initialize configuration file from default setting and saves it into config_file_path
+    """
     logger.info(f"Create configuration file in project folder")
     if os.path.exists(config_file_path):
         os.remove(config_file_path)
@@ -21,6 +24,9 @@ def create_config(
 
 
 def delete_config(config_file_path: str, logger: logging.Logger):
+    """
+    delete configuration file from the project folder
+    """
     logger.info("Delete configuration file from project folder")
     os.remove(config_file_path)
 

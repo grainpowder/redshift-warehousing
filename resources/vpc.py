@@ -10,6 +10,9 @@ def create_vpc(
     logger: logging.Logger, 
     session: boto3.Session
 ) -> ConfigParser:
+    """
+    create VPC and corresponding subnets to create clusters within
+    """
     ec2_client = session.client("ec2")
 
     # VPC
@@ -128,11 +131,14 @@ def create_vpc(
     return parser
 
 
-def delete_vpc(
+def delete_vpc( 
     parser: ConfigParser, 
     logger: logging.Logger, 
     session: boto3.Session
 ) -> None:
+    """
+    delete subnets and VPC generated to initiate Redshift cluster
+    """
     ec2_client = session.client("ec2")
 
     # Subnets
