@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS staging_songs (
 
 songplay_table_create = """
 CREATE TABLE IF NOT EXISTS songplays (
-    songplay_id INT IDENTITY(0, 1), -- act as SERIAL type of pure postgresql
+    songplay_id INT IDENTITY(0, 1) PRIMARY KEY, -- act as SERIAL type of pure postgresql
     start_time TIMESTAMP,
     user_id INT,
     level VARCHAR,
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS songplays (
 
 user_table_create = """
 CREATE TABLE IF NOT EXISTS users (
-    user_id INT,
+    user_id INT PRIMARY KEY,
     first_name VARCHAR,
     last_name VARCHAR,
     gender CHAR(1),
@@ -81,27 +81,27 @@ CREATE TABLE IF NOT EXISTS users (
 
 song_table_create = """
 CREATE TABLE IF NOT EXISTS songs (
-    song_id VARCHAR,
-    title VARCHAR,
-    artist_id VARCHAR,
+    song_id VARCHAR PRIMARY KEY,
+    title VARCHAR NOT NULL,
+    artist_id VARCHAR NOT NULL,
     year INT,
-    duration FLOAT
+    duration FLOAT NOT NULL
 );
 """
 
 artist_table_create = """
 CREATE TABLE IF NOT EXISTS artists (
-    artist_id VARCHAR,
-    name VARCHAR,
-    location TEXT ,
-    latitude FLOAT ,
+    artist_id VARCHAR PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    location TEXT,
+    latitude FLOAT,
     longitude FLOAT
 );
 """
 
 time_table_create = """
 CREATE TABLE IF NOT EXISTS time (
-    start_time TIMESTAMP,
+    start_time TIMESTAMP PRIMARY KEY,
     hour INT,
     day INT,
     week INT,
@@ -122,7 +122,7 @@ JSON '{parser.get('s3', 'log_jsonpath')}'
 
 staging_songs_copy = f"""
 COPY staging_songs
-FROM '{parser.get('s3', 'log_data')}'
+FROM '{parser.get('s3', 'song_data')}'
 IAM_ROLE '{parser.get('iam.role', 'arn')}'
 JSON 'auto'
 """

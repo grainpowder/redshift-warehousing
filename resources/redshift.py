@@ -59,6 +59,17 @@ def create_cluster(
         ClusterIdentifier=parser.get("cluster", "identifier"), 
         AddIamRoles=[parser.get("iam.role", "arn")]
     )
+
+    logger.info("Waiting for IAM role to be applied to the cluster")
+    apply_status = "adding"
+    while apply_status != "in-sync":
+        cluster_info = [
+            cluster
+            for cluster in redshift_client.describe_clusters()["Clusters"]
+            if cluster["ClusterIdentifier"] == parser.get("cluster", "identifier")
+        ][0]
+        apply_status = cluster_info["IamRoles"][0]["ApplyStatus"]
+        time.sleep(5)
     
     logger.info("Save DB host information in configuration file")
     parser["cluster"]["db_password"] = db_password
